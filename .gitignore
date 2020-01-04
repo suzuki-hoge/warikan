@@ -1,0 +1,8 @@
+.stack-work/
+*.cabal
+
+*.log
+
+.DS_Store
+.idea/
+*.iml
