@@ -1,0 +1,173 @@
+@startuml
+
+hide empty methods
+
+package Party {
+    class Party << (T, orange) >> {
+        PartyName
+        PartyHoldAt
+        FractionPolicy
+        [Participant]
+        <font color=red>AdjustingUnitAmount</font>
+    }
+    class PartyName << (T, orange) >> {
+        NonEmptyString
+    }
+    class PartyHoldAt << (T, orange) >> {
+        NonEmptyString
+    }
+    class FractionPolicy << (S, lightskyblue) >> {
+        Secretary | NextParty
+    }
+    class Participant << (T, orange) >> {
+        ParticipantId
+        ParticipantName
+        ParticipantType
+        <font color=red>PaymentSection</font>
+    }
+    class ParticipantId << (T, orange) >> {
+        NonEmptyString
+    }
+    class ParticipantName << (T, orange) >> {
+        NonEmptyString
+    }
+    class ParticipantType << (S, lightskyblue) >> {
+        Secretary | Participant
+    }
+
+    class plan << (F, lightgreen) >> {
+        PartyName -> PartyHoldAt -> <font color=red>BillingAmount</font> -> <font color=red>AdjustingUnitAmount</font> -> Party
+    }
+    class add << (F, lightgreen) >> {
+        Party -> Participant -> Party
+    }
+    class remove << (F, lightgreen) >> {
+        Party -> ParticipantId -> Party
+    }
+    class changeAdjustingUnitAmount << (F, lightgreen) >> {
+        Party -> <font color=red>AdjustingUnitAmount</font> -> Party
+    }
+    class demand << (F, lightgreen) >> {
+        Party -> Either <font color=red>PaymentError</font> [(ParticipantId, <font color=red>PaymentAmount</font>)]
+    }
+
+    Party -u-> PartyName
+    Party -u-> PartyHoldAt
+    Party -u-> FractionPolicy
+
+    Participant -u-> ParticipantId
+    Participant -u-> ParticipantName
+    Participant -u-> ParticipantType
+
+    Party -u-> "0..*" Participant
+}
+
+package Payment {
+    class PaymentSection << (S, lightskyblue) >> {
+        More | Normal | Less
+    }
+    class AdjustingUnitAmount << (T, orange) >> {
+        Money
+    }
+    class AdjustingUnitCount << (T, orange) >> {
+        Int
+    }
+    class BillingAmount << (T, orange) >> {
+        Money
+    }
+    class SharingAmount << (T, orange) >> {
+        Money
+    }
+    class FractionAmount << (T, orange) >> {
+        Money
+    }
+    class PaymentAmount << (T, orange) >> {
+        Money
+    }
+
+    class calculate << (F, lightgreen) >> {
+        BillingAmount -> [PaymentSection] -> AdjustingUnitAmount -> Either PaymentError ([(PaymentSection, PaymentAmount)], FractionAmount)
+    }
+    class divide << (F, lightgreen) >> {
+        BillingAmount -> (SharingAmount, FractionAmount)
+    }
+    class adjustByUnit << (F, lightgreen) >> {
+        [PaymentSection] -> [(PaymentSection, AdjustingUnitCount)]
+    }
+    class sharing << (F, lightgreen) >> {
+        SharingAmount -> AdjustingUnitAmount -> [(PaymentSection, AdjustingUnitCount)] -> Either PaymentError [(PaymentSection, PaymentAmount)]
+    }
+    class "(<++)" << (F, lightgreen) >> {
+        PaymentAmount -> FractionAmount -> PaymentAmount
+    }
+
+    class PaymentError << (E, tomato) >> {
+        TooLargeAdjustingUnitAmount
+    }
+
+    divide -u-> BillingAmount : in <
+    divide -d-> SharingAmount : out >
+    divide -d-> FractionAmount : out >
+
+    adjustByUnit -u-> PaymentSection : in <
+    adjustByUnit -d-> AdjustingUnitCount : out >
+
+    sharing --> SharingAmount : in <
+    sharing ----> AdjustingUnitAmount : in <
+    sharing ---> PaymentSection : in <
+    sharing --> AdjustingUnitCount : in <
+    sharing -d-> PaymentAmount : out >
+    sharing --> PaymentError : out >
+
+    calculate -d-> divide
+    calculate -d-> adjustByUnit
+    calculate -d-> sharing
+
+    "(<++)" -u-> PaymentAmount : out >
+    "(<++)" -u-> FractionAmount : in <
+}
+
+Party --> BillingAmount
+Party --> AdjustingUnitAmount
+Participant --> PaymentSection
+
+demand --> calculate
+
+package Fundamental {
+    class Money << (T, orange) >> {
+        Int
+    }
+    class NonEmptyString << (T, orange) >> {
+        String
+        IsString
+    }
+    class DateTime << (T, orange) >> {
+        String
+        IsString
+    }
+    class ($+$) << (F, lightgreen) >> {
+        Money -> Money -> Money
+    }
+    class ($*$) << (F, lightgreen) >> {
+        Money -> Int -> Money
+    }
+    "($+$)" --> Money
+    "($*$)" --> Money
+}
+
+' layout
+
+add -d[hidden]-> remove
+"remove" -[hidden]d-> changeAdjustingUnitAmount
+changeAdjustingUnitAmount -[hidden]d-> demand
+
+demand -[hidden]l-> Party
+
+divide -[hidden]r-> adjustByUnit
+adjustByUnit -[hidden]r-> sharing
+
+AdjustingUnitAmount -[hidden]d-> "($+$)"
+Money -[hidden]r-> DateTime
+DateTime -[hidden]r-> NonEmptyString
+
+@enduml
