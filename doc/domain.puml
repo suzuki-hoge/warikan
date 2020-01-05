@@ -20,13 +20,9 @@ package Party {
         Secretary | NextParty
     }
     class Participant << (T, orange) >> {
-        ParticipantId
         ParticipantName
         ParticipantType
         <font color=red>PaymentSection</font>
-    }
-    class ParticipantId << (T, orange) >> {
-        NonEmptyString
     }
     class ParticipantName << (T, orange) >> {
         NonEmptyString
@@ -36,26 +32,25 @@ package Party {
     }
 
     class plan << (F, lightgreen) >> {
-        PartyName -> PartyHoldAt -> <font color=red>BillingAmount</font> -> <font color=red>AdjustingUnitAmount</font> -> Party
+        PartyName -> PartyHoldAt -> (ParticipantName, <font color=red>PaymentSection</font>) -> <font color=red>BillingAmount</font> -> <font color=red>AdjustingUnitAmount</font> -> Party
     }
     class add << (F, lightgreen) >> {
         Party -> Participant -> Party
     }
     class remove << (F, lightgreen) >> {
-        Party -> ParticipantId -> Party
+        Party -> ParticipantName -> Party
     }
     class changeAdjustingUnitAmount << (F, lightgreen) >> {
         Party -> <font color=red>AdjustingUnitAmount</font> -> Party
     }
     class demand << (F, lightgreen) >> {
-        Party -> Either <font color=red>PaymentError</font> [(ParticipantId, <font color=red>PaymentAmount</font>)]
+        Party -> Either <font color=red>PaymentError</font> [(ParticipantName, <font color=red>PaymentAmount</font>)]
     }
 
     Party -u-> PartyName
     Party -u-> PartyHoldAt
     Party -u-> FractionPolicy
 
-    Participant -u-> ParticipantId
     Participant -u-> ParticipantName
     Participant -u-> ParticipantType
 
@@ -84,30 +79,36 @@ package Payment {
     class PaymentAmount << (T, orange) >> {
         Money
     }
+    class PaymentAmount << (T, orange) >> {
+        Money
+    }
 
     class calculate << (F, lightgreen) >> {
         BillingAmount -> [PaymentSection] -> AdjustingUnitAmount -> Either PaymentError ([(PaymentSection, PaymentAmount)], FractionAmount)
     }
     class divide << (F, lightgreen) >> {
-        BillingAmount -> (SharingAmount, FractionAmount)
+        BillingAmount -> DivideNumber -> AdjustingUnitAmount -> Either PaymentError (SharingAmount, FractionAmount)
     }
     class adjustByUnit << (F, lightgreen) >> {
         [PaymentSection] -> [(PaymentSection, AdjustingUnitCount)]
     }
     class sharing << (F, lightgreen) >> {
-        SharingAmount -> AdjustingUnitAmount -> [(PaymentSection, AdjustingUnitCount)] -> Either PaymentError [(PaymentSection, PaymentAmount)]
+        SharingAmount -> AdjustingUnitAmount -> DivideNumber -> [(PaymentSection, AdjustingUnitCount)] -> Either PaymentError [(PaymentSection, PaymentAmount)]
     }
     class "(<++)" << (F, lightgreen) >> {
         PaymentAmount -> FractionAmount -> PaymentAmount
     }
 
     class PaymentError << (E, tomato) >> {
+        UnsharableAdjustingUnitAmount
         TooLargeAdjustingUnitAmount
     }
 
     divide -u-> BillingAmount : in <
+    divide -d-> AdjustingUnitAmount : in <
     divide -d-> SharingAmount : out >
     divide -d-> FractionAmount : out >
+    divide -d-> PaymentError : out >
 
     adjustByUnit -u-> PaymentSection : in <
     adjustByUnit -d-> AdjustingUnitCount : out >
@@ -144,6 +145,12 @@ package Fundamental {
     class DateTime << (T, orange) >> {
         String
         IsString
+    }
+    class mapR << (F, lightgreen) >> {
+        (b -> c) -> (a, b) -> (a, c)
+    }
+    class mapL << (F, lightgreen) >> {
+        (a -> c) -> (a, b) -> (c, b)
     }
     class ($+$) << (F, lightgreen) >> {
         Money -> Money -> Money
