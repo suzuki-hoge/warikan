@@ -2,7 +2,7 @@ from party import Party, Participant
 
 def read_all():
     def party(line):
-        return Party(line.split(',')[0], line.split(',')[1], map(participant, line.split(',')[2].split('/')), int(line.split(',')[3]), int(line.split(',')[4]))
+        return Party(line.split(',')[0], line.split(',')[1], map(participant, line.split(',')[2].split('/')), line.split(',')[3], line.split(',')[4])
 
     def participant(line):
         return Participant(line.split(':')[0], line.split(':')[1], line.split(':')[2])
