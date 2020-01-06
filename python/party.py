@@ -60,7 +60,7 @@ def add(party, participant):
     return party.add(participant)
 
 
-# party = Party.plan('new-year', '2019/01/01', 'p1', 'M', 60000, 1000)
+# party = Party.plan('new-year', '2019-01-01', 'p1', 'M', 60000, 1000)
 # party.debug()
 
 # added = party.add(Participant('p2', 'NotSec', 'N'))
@@ -73,18 +73,18 @@ def add(party, participant):
 # changed.debug()
 
 
-party = Party(
-    'new-year',
-    '2019/01/01',
-    [
-        Participant('p1', 'Sec',    'M'),
-        Participant('p2', 'NotSec', 'M'),
-        Participant('p3', 'NotSec', 'M'),
-        Participant('p4', 'NotSec', 'N'),
-        Participant('p5', 'NotSec', 'L'),
-        Participant('p6', 'NotSec', 'L')
-    ],
-    65000,
-    500
-)
-print party.demand()
+# party = Party(
+#     'new-year',
+#     '2019/01/01',
+#     [
+#         Participant('p1', 'Sec',    'M'),
+#         Participant('p2', 'NotSec', 'M'),
+#         Participant('p3', 'NotSec', 'M'),
+#         Participant('p4', 'NotSec', 'N'),
+#         Participant('p5', 'NotSec', 'L'),
+#         Participant('p6', 'NotSec', 'L')
+#     ],
+#     65000,
+#     500
+# )
+# print party.demand()
