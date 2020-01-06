@@ -1,0 +1,9 @@
+.stack-work/
+*.cabal
+
+*.log
+
+.idea/
+*.iml
+
+report/
