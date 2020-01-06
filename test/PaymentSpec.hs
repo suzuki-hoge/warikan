@@ -111,20 +111,26 @@ spec = do
 
 
   describe "calculate" $ do
-    it "calculate   900 with M, N, L          adjust by  100 =   600,   200,   100 and  0 fraction" $
+    it "calculate   900 with M, N, L          adjust by  100 =   600,   200,   100 and    0 fraction" $
       calculate (ba 900) [More, Normal, Less] (aua 100) `shouldBe` Right ([mpa 600, npa 200, lpa 100], fa 0)
 
-    it "calculate   990 with M, N, L          adjust by  100 =   600,   200,   100 and 90 fraction" $
+    it "calculate   990 with M, N, L          adjust by  100 =   600,   200,   100 and   90 fraction" $
       calculate (ba 990) [More, Normal, Less] (aua 100) `shouldBe` Right ([mpa 600, npa 200, lpa 100], fa 90)
 
-    it "calculate   990 with M, N, L          adjust by   10 =   330,   290,   280 and  0 fraction" $
+    it "calculate   990 with M, N, L          adjust by   10 =   330,   290,   280 and    0 fraction" $
       calculate (ba 990) [More, Normal, Less] (aua 10) `shouldBe` Right ([mpa 360, npa 320, lpa 310], fa 0)
 
-    it "calculate   995 with M, N, L          adjust by   10 =   330,   290,   280 and  5 fraction" $
+    it "calculate   995 with M, N, L          adjust by   10 =   330,   290,   280 and    5 fraction" $
       calculate (ba 995) [More, Normal, Less] (aua 10) `shouldBe` Right ([mpa 360, npa 320, lpa 310], fa 5)
 
-    it "calculate 60000 with M, M, M, N, L, L adjust by 1000 = 15000,  7000,  4000 and  0 fraction" $
+    it "calculate 60000 with M, M, M, N, L, L adjust by 1000 = 15000,  7000,  4000 and    0 fraction" $
       calculate (ba 60000) [More, More, More, Normal, Less, Less] (aua 1000) `shouldBe` Right ([mpa 15000, npa 7000, lpa 4000], fa 0)
+
+    it "calculate 65000 with M, M, M, N, L, L adjust by 1000 = 15000,  7000,  4000 and 5000 fraction" $
+      calculate (ba 65000) [More, More, More, Normal, Less, Less] (aua 1000) `shouldBe` Right ([mpa 15000, npa 7000, lpa 4000], fa 5000)
+
+    it "calculate 65000 with M, M, M, N, L, L adjust by  500 = 13000,  9000,  7500 and 2000 fraction" $
+      calculate (ba 65000) [More, More, More, Normal, Less, Less] (aua 500) `shouldBe` Right ([mpa 13000, npa 9000, lpa 7500], fa 2000)
 
 
   describe "add fraction to payment" $

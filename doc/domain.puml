@@ -8,16 +8,17 @@ package Party {
         PartyHoldAt
         FractionPolicy
         [Participant]
+        <font color=red>BillingAmount</font>
         <font color=red>AdjustingUnitAmount</font>
     }
     class PartyName << (T, orange) >> {
         NonEmptyString
     }
     class PartyHoldAt << (T, orange) >> {
-        NonEmptyString
+        DateTime
     }
     class FractionPolicy << (S, lightskyblue) >> {
-        Secretary | NextParty
+        PaybackToSecretary | NextParty
     }
     class Participant << (T, orange) >> {
         ParticipantName
@@ -28,11 +29,11 @@ package Party {
         NonEmptyString
     }
     class ParticipantType << (S, lightskyblue) >> {
-        Secretary | Participant
+        Secretary | NotSecretary
     }
 
     class plan << (F, lightgreen) >> {
-        PartyName -> PartyHoldAt -> (ParticipantName, <font color=red>PaymentSection</font>) -> <font color=red>BillingAmount</font> -> <font color=red>AdjustingUnitAmount</font> -> Party
+        PartyName -> PartyHoldAt -> FractionPolicy -> (ParticipantName, <font color=red>PaymentSection</font>) -> <font color=red>BillingAmount</font> -> <font color=red>AdjustingUnitAmount</font> -> Party
     }
     class add << (F, lightgreen) >> {
         Party -> Participant -> Party
