@@ -40,7 +40,7 @@ class Party:
             else:
                 return (p.participantName, paymentAmount)
 
-        (units, fractionAmount) = payment.calculate(self.billingAmount, (map(lambda p: p.paymentSection, self.participants)), self.adjustingUnitAmount)
+        (units, fractionAmount) = payment.calculate(int(self.billingAmount), (map(lambda p: p.paymentSection, self.participants)), int(self.adjustingUnitAmount))
         return map(lambda p: bind(units, fractionAmount, p), self.participants)
 
 

@@ -1,4 +1,4 @@
-from bottle import get, post, put, request, response, hook, run
+from bottle import route, get, post, put, request, response, hook, run
 import json
 
 import db, party
@@ -19,6 +19,13 @@ def handle(f):
 @hook('after_request')
 def allow_cors():
     response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS'
+
+
+@route('<any:path>', method = 'OPTIONS')
+def options(**kwargs):
+    return {}
 
 
 @get('/party/<partyName>')
@@ -36,19 +43,19 @@ def find(partyName):
 @post('/party/plan')
 @handle
 def plan():
-    p = request.params
+    p = request.json
 
-    new = party.Party.plan(p.partyName, p.partyHoldAt, p.secretaryName, p.paymentSection, int(p.billingAmount), int(p.adjustingUnitAmount))
+    new = party.Party.plan(p.get('partyName'), p.get('partyHoldAt'), p.get('secretaryName'), p.get('paymentSection'), p.get('billingAmount'), p.get('adjustingUnitAmount'))
     db.write(new)
 
  
 @put('/party/<partyName>/add')
 @handle
 def add(partyName):
-    p = request.params
+    p = request.json
 
     found = db.read(partyName)
-    updated = found.add(party.Participant(p.participantName, 'NotSec', p.paymentSection))
+    updated = found.add(party.Participant(p.get('participantName'), 'NotSec', p.get('paymentSection')))
     db.write(updated)
 
 
@@ -65,10 +72,10 @@ def remove(partyName):
 @put('/party/<partyName>/change')
 @handle
 def change(partyName):
-    p = request.params
+    p = request.json
 
     found = db.read(partyName)
-    updated = found.change(int(p.adjustingUnitAmount))
+    updated = found.change(p.get('adjustingUnitAmount'))
     db.write(updated)
 
 
@@ -77,11 +84,7 @@ def change(partyName):
 def demand(partyName):
     found = db.read(partyName)
 
-    return map(lambda (participantName, paymentAmount): {'participantName': participantName, 'paymentAmount': paymentAmount}, found.demand())
+    return map(lambda (participantName, paymentAmount): {'participantName': participantName, 'paymentAmount': str(paymentAmount)}, found.demand())
 
-
-# plan('new-year', '2019-01-01', 'p1', 'M', 60000, 1000)
-# print find('new-year')
-# print demand('new-year')
 
 run(host = 'localhost', port = 9000)

@@ -23,7 +23,7 @@ def read(partyName):
 
 def write(party):
     def party_line(party):
-        return '%s,%s,%s,%d,%d' % (party.partyName, party.partyHoldAt, ('/'.join(map(participant_line, party.participants))), party.billingAmount, party.adjustingUnitAmount)
+        return '%s,%s,%s,%s,%s' % (party.partyName, party.partyHoldAt, ('/'.join(map(participant_line, party.participants))), party.billingAmount, party.adjustingUnitAmount)
 
     def participant_line(participant):
         return '%s:%s:%s' % (participant.participantName, participant.participantType, participant.paymentSection)

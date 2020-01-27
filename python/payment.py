@@ -1,7 +1,11 @@
 def calculate(billingAmount, paymentSections, adjustingUnitAmount):
     divideNumber = len(paymentSections)
     (sharingAmount, fractionAmount) = divide(billingAmount, divideNumber, adjustingUnitAmount)
+    print 'divide: ',
+    print (sharingAmount, fractionAmount)
     units = adjustByUnit(paymentSections)
+    print 'units: ',
+    print units
     return (sharing(sharingAmount, adjustingUnitAmount, divideNumber, units), fractionAmount)
 
 

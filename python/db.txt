@@ -1,0 +1,3 @@
+first,2020-01-28,hoge:Sec:M/piyo:NotSec:N/zoki:NotSec:N/fuga:NotSec:L,3000,100
+demo1,2020-01-28,hoge:Sec:M/piyo:NotSec:N/zoki:NotSec:N/fuga:NotSec:L,3000,100
+demo2,2020-01-28,hoge:Sec:M/piyo:NotSec:M/zoki:NotSec:N/fuga:NotSec:L,3000,100
