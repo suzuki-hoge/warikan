@@ -1,0 +1,120 @@
+@startuml
+
+hide empty methods
+
+package Party {
+    class Party << (T, orange) >> {
+    }
+    class MemberSection << (T, orange) >> {
+    }
+    class Secretary << (T, orange) >> {
+    }
+    class Accumulator << (T, orange) >> {
+    }
+    class MemberCount << (T, orange) >> {
+        Int
+    }
+
+    class Name << (T, orange) >> {
+        String
+    }
+    MemberSection *--> Name
+    MemberSection *--> Section
+
+    class MemberPercent << (T, orange) >> {
+    }
+    class Percent << (T, orange) >> {
+        Int
+    }
+    MemberPercent *--> Name
+    MemberPercent *--> Percent
+
+    class Section << (S, lightskyblue) >> {
+        L | M | S
+    }
+
+    class Adjuster << (C, pink) >> {
+        adjust :: a -> Fraction -> Bill
+    }
+    Secretary -u-|> Adjuster
+    Accumulator -u-|> Adjuster
+    Adjuster --> Bill : > out
+
+    class Sharing << (T, orange) >> {
+        Int
+    }
+    class Fraction << (C, pink) >> {
+        makeFraction :: Amount -> MemberCount -> (Sharing, a)
+    }
+    class Positive << (T, orange) >> {
+        Int
+    }
+    class Negative << (T, orange) >> {
+        Int
+    }
+    Positive -u-|> Fraction
+    Negative -u-|> Fraction
+    Fraction --> Sharing : > out
+
+    class Amount << (T, orange) >> {
+        Int
+    }
+
+    Party *--> "2.." MemberSection
+    Party *--> Adjuster
+    Party *--> Fraction
+    Party *--> Amount
+
+    class Bill << (T, orange) >> {
+        Int
+    }
+    Bill *--> Name
+
+    class setting << (F, lightgreen) >> {
+        MemberSection -> MemberSection -> [MemberSection] -> Adjuster -> Amount -> Party
+    }
+    setting -d-> Party : > out
+
+    class demand << (F, lightgreen) >> {
+        [MemberPercent] -> Party -> Either Error [Bill]
+    }
+    class Error << (S, lightskyblue) >> {
+        SectionMismatch | PercentMismatch
+    }
+    demand --> "2.." Bill : > out
+    demand --> Error : > out
+
+    class count << (F, lightgreen) >> {
+        [MemberPercent] -> MemberCount
+    }
+    count --> MemberCount : > out
+
+    class share << (F, lightgreen) >> {
+        [MemberPercent] -> Sharing -> [Bill]
+    }
+    share --> "2.." Bill : > out
+
+    class "|>" << (F, lightgreen) >> {
+        a -> (a -> b) -> b
+    }
+    class "||>" << (F, lightgreen) >> {
+        (a, b) -> ((a -> c), (b -> d)) -> (c, d)
+    }
+    class "><" << (F, lightgreen) >> {
+        (a, b) -> ((a, b) -> c) -> c
+    }
+}
+
+'MemberSection -> MemberSection -> [MemberSection] -> Adjuster -> Amount -> `setting` -> Party
+'                                                                     [MemberPercent] -> Party -> `demand` -> Either Error [Bill]
+'
+'[MemberPercent] -> `count` -> MemberCount
+'                    Amount -> MemberCount -> `makeFraction` -> (Sharing, Positive)
+'                                                  Secretary -> (_,       Positive) -> `adjust` -> Bill ("Secretary", 30)
+'                                            [MemberPercent] -> (Sharing, _       ) -> `share`  -> [Bill]
+'                                                                                                  ↓
+'                                                                                                 `fold`
+'                                                                                                  ↓
+'                                                                                                  [Bill]
+
+@enduml
