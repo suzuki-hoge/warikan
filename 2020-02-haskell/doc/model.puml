@@ -2,9 +2,21 @@
 
 hide empty methods
 
-package Party {
-    class Party << (T, orange) >> {
+package Application {
+    class apply << (F, lightgreen) >> {
+        MemberSection -> MemberSection -> [MemberSection] -> Amount -> Adjuster -> Fraction -> [MemberPercent] -> Either Error [Bill]
     }
+    class guard << (F, lightgreen) >> {
+        [MemberSection] -> [MemberPercent] -> Either Error [MemberPercent]
+    }
+    class Error << (S, lightskyblue) >> {
+        SectionMismatch | PercentMismatch
+    }
+    apply -r-> guard
+    guard -r-> Error
+}
+
+package Domain {
     class MemberSection << (T, orange) >> {
     }
     class Secretary << (T, orange) >> {
@@ -33,88 +45,76 @@ package Party {
         L | M | S
     }
 
-    class Adjuster << (C, pink) >> {
+    class "Adjuster a" as Adjuster << (C, pink) >> {
         adjust :: a -> Fraction -> Bill
     }
-    Secretary -u-|> Adjuster
-    Accumulator -u-|> Adjuster
+    Secretary -d-|> Adjuster
+    Accumulator -d-|> Adjuster
     Adjuster --> Bill : > out
 
     class Sharing << (T, orange) >> {
         Int
     }
-    class Fraction << (C, pink) >> {
+    class "Fraction a" as Fraction << (C, pink) >> {
         makeFraction :: Amount -> MemberCount -> (Sharing, a)
+        value :: a -> Int
     }
-    class Positive << (T, orange) >> {
+    class Missing << (T, orange) >> {
         Int
     }
-    class Negative << (T, orange) >> {
+    class Excessing << (T, orange) >> {
         Int
     }
-    Positive -u-|> Fraction
-    Negative -u-|> Fraction
+    Missing -d-|> Fraction
+    Excessing -d-|> Fraction
     Fraction --> Sharing : > out
 
     class Amount << (T, orange) >> {
         Int
     }
 
-    Party *--> "2.." MemberSection
-    Party *--> Adjuster
-    Party *--> Fraction
-    Party *--> Amount
-
     class Bill << (T, orange) >> {
         Int
     }
     Bill *--> Name
 
-    class setting << (F, lightgreen) >> {
-        MemberSection -> MemberSection -> [MemberSection] -> Adjuster -> Amount -> Party
-    }
-    setting -d-> Party : > out
-
     class demand << (F, lightgreen) >> {
-        [MemberPercent] -> Party -> Either Error [Bill]
+        Adjuster -> Fraction -> [MemberPercent] -> [Bill]
     }
-    class Error << (S, lightskyblue) >> {
-        SectionMismatch | PercentMismatch
-    }
-    demand --> "2.." Bill : > out
-    demand --> Error : > out
 
     class count << (F, lightgreen) >> {
         [MemberPercent] -> MemberCount
     }
+    count --> MemberPercent : < in
     count --> MemberCount : > out
 
     class share << (F, lightgreen) >> {
         [MemberPercent] -> Sharing -> [Bill]
     }
-    share --> "2.." Bill : > out
+    share --> Sharing : < in
+    share --> MemberPercent : < in
+    share --> Bill : > out
 
-    class "|>" << (F, lightgreen) >> {
-        a -> (a -> b) -> b
-    }
-    class "||>" << (F, lightgreen) >> {
-        (a, b) -> ((a -> c), (b -> d)) -> (c, d)
-    }
-    class "><" << (F, lightgreen) >> {
-        (a, b) -> ((a, b) -> c) -> c
-    }
+    demand -d-> count
+    demand -d-> share
 }
 
-'MemberSection -> MemberSection -> [MemberSection] -> Adjuster -> Amount -> `setting` -> Party
-'                                                                     [MemberPercent] -> Party -> `demand` -> Either Error [Bill]
-'
+package Fundamental {
+}
+
+apply -d-> demand
+apply --> Amount
+apply --> "2.." MemberSection
+
+Percent -[hidden]d-> Fundamental
+
 '[MemberPercent] -> `count` -> MemberCount
-'                    Amount -> MemberCount -> `makeFraction` -> (Sharing, Positive)
-'                                                  Secretary -> (_,       Positive) -> `adjust` -> Bill ("Secretary", 30)
-'                                            [MemberPercent] -> (Sharing, _       ) -> `share`  -> [Bill]
-'                                                                                                  ↓
+'                    Amount -> MemberCount -> `makeFraction` -> (Sharing, Missing)
+'                                            [MemberPercent] -> (Sharing, _      ) -> `share`  -> [Bill]
+'                                                  Secretary -> (_,       Missing) -> `adjust` ->  Bill
+'                                                                                                   ↓
 '                                                                                                 `fold`
-'                                                                                                  ↓
-'                                                                                                  [Bill]
+'                                                                                                   ↓
+'                                                                                                 [Bill]
 
 @enduml
