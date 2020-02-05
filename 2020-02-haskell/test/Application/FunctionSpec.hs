@@ -10,7 +10,7 @@ import Domain.Type
 spec :: Spec
 spec = do
   describe "apply failure" $ do
-    it "set [John, Jane, Jack] but apply with [John, Jane] is member mismatch." $ do
+    it "set [John, Jane, Jack] but apply with [John, Jane] is member error." $ do
       let ms1 = MemberSection (Name "John") L
       let ms2 = MemberSection (Name "Jane") M
       let ms3 = MemberSection (Name "Jack") S
@@ -20,7 +20,7 @@ spec = do
 
       apply ms1 ms2 [ms3] (Amount 2000) Accumulator Excessing [mp1, mp2] `shouldBe` Left MemberError
 
-    it "apply with [50%, 40%] is percent mismatch." $ do
+    it "apply with [50%, 40%] is percent error." $ do
       let ms1 = MemberSection (Name "John") L
       let ms2 = MemberSection (Name "Jane") M
 
@@ -29,7 +29,7 @@ spec = do
 
       apply ms1 ms2 [] (Amount 2000) Accumulator Excessing [mp1, mp2] `shouldBe` Left PercentError
 
-    it "set [L, M, S] but apply with [50%, 20%, 30%] is section mismatch." $ do
+    it "set [L, M, S] but apply with [50%, 20%, 30%] is section error." $ do
       let ms1 = MemberSection (Name "John") L
       let ms2 = MemberSection (Name "Jane") M
       let ms3 = MemberSection (Name "Jack") S
