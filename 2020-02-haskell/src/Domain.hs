@@ -1,3 +1,4 @@
+-- | Domain modules exporter.
 module Domain (
   module Domain.Function
 , module Domain.Type

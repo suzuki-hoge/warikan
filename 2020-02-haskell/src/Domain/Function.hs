@@ -1,10 +1,12 @@
+-- | Domain functions.
 module Domain.Function where
 
 import Domain.Type
 import Fundamental.Function
 
 
-demand :: (Adjuster a, Fraction f) => a -> f -> Amount -> [MemberPercent] -> [Bill]
+-- | Fix bills.
+demand :: (Adjuster adjuster, Fraction fraction) => adjuster -> fraction -> Amount -> [MemberPercent] -> [Bill]
 demand adjuster fraction amount mps =
   count mps
   |> makeFraction fraction amount

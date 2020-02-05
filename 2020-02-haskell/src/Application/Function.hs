@@ -1,3 +1,4 @@
+-- | Application functions.
 module Application.Function where
 
 import Data.List ( sort )
@@ -6,6 +7,7 @@ import Application.Type
 import Domain
 import Fundamental
 
+-- | Demand bills if input is valid.
 apply :: (Adjuster a, Fraction f) => MemberSection -> MemberSection -> [MemberSection] -> Amount -> a -> f -> [MemberPercent] -> Either Error [Bill]
 apply ms1 ms2 mss amount adjuster fraction mps = guard ([ms1, ms2] ++ mss) mps <&> demand adjuster fraction amount
   where
@@ -22,7 +24,7 @@ apply ms1 ms2 mss amount adjuster fraction mps = guard ([ms1, ms2] ++ mss) mps <
               , head' $ sort $ concatMap (\(s, p) -> if s == L then [p] else []) zipped
               ]
       in
-      if snames /= pnames    then Left MemberMismatch  else
-      if sum ps /= 100       then Left PercentMismatch else
-      if sides /= sort sides then Left SectionMismatch else
+      if snames /= pnames    then Left MemberError  else
+      if sum ps /= 100       then Left PercentError else
+      if sides /= sort sides then Left SectionError else
       Right mps
